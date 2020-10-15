@@ -1,5 +1,4 @@
 from tkinter import *
-import tkinter.font as font
 import pyglet, os, random
 
 tiles = []
