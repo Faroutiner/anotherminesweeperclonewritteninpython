@@ -1,8 +1,6 @@
 from tkinter import *
 import tkinter.font as font
-import pyglet
-import os
-from grid_generator import *
+import pyglet, os, random
 
 tiles = []
 size_x = 9
@@ -12,6 +10,51 @@ is_active = False
 time = -1
 mines_number = 10
 frame3 = []
+import random
+
+# Function that generates grid
+def generate(height, width, mines_number):
+    
+    # Prepare grid by setting all tiles to 0
+    grid = []
+
+    for i in range(height):
+        grid.append([])
+        for j in range(width):
+            grid[i].append(0)
+
+    for i in range(mines_number):
+        while True:
+            # Generate radom mine position
+            mine_y = random.randint(0, height - 1)
+            mine_x = random.randint(0, width - 1)
+
+            neighbour_mines = 0
+
+            # Check if there are any mines nearby
+            for y in range(mine_y - 1, mine_y + 3):
+                for x in range(mine_x - 1, mine_x + 3):
+                    try:
+                        if grid[y][x] == -1:
+                            neighbour_mines += 1
+                    except: pass
+
+            # Check if there is already a mine
+            if grid[mine_y][mine_x] != -1 and neighbour_mines <= 3:
+                grid[mine_y][mine_x] = -1
+            
+                # Set neighbour tile to number of mines it's touching 
+                for y in range(mine_y - 1, mine_y + 2):
+                    for x in range(mine_x - 1, mine_x + 2):
+                        try:
+                            if grid[y][x] != -1 and y >= 0 and x >= 0:
+                                grid[y][x] += 1
+                        except: pass
+            
+                break
+
+    return grid
+
 
 def is_win():
     global is_active, mines_number
@@ -39,6 +82,7 @@ def is_win():
             for x in range(size_x):
                 tiles[y][x].config(state = "disabled")
 
+                
 def you_lost():
     global is_active, mines_number
 
@@ -52,6 +96,7 @@ def you_lost():
                 tiles[y][x].config(relief=RAISED, image=flag_without_bomb_img, height = 20, width = 18)
             tiles[y][x].config(state = "disabled")
 
+            
 def flags_num():
     flags = 0
     
@@ -66,6 +111,7 @@ def flags_num():
     
     return mines_number - flags
 
+
 def add_flag(y, x):
     if tiles[y][x]["image"] == "" and tiles[y][x]["state"] != "disabled" and is_active and flags_num() <= 999:
         tiles[y][x].config(image = flag_img, state="disabled", height = 20, width = 18)
@@ -74,6 +120,7 @@ def add_flag(y, x):
 
     flags_left_label.config(text=flags_num())
 
+    
 def check_tile(row_number, button_number):
     global is_active, grid, tiles, size_x, size_y
     color = "white"
@@ -110,6 +157,7 @@ def check_tile(row_number, button_number):
                     if tiles[y][x]["text"] != " ":
                         check_tile(y, x)    
 
+                        
 def timer():
     global time, is_active
     if time == 999:
@@ -121,18 +169,21 @@ def timer():
     if is_active:
         root.after(1000, timer)
 
+        
 def on_hover(event):
     global is_active
 
     if is_active:
         new_game_btn.config(image = surprised_python_img)
 
+        
 def on_leave(event):
     global is_active
 
     if is_active:
         new_game_btn.config(image = python_img)
 
+        
 def new_game(btn):
     global grid, tiles, size_y, size_x, mines_number, frame3, is_active, time
     grid = generate(size_y, size_x, mines_number)
@@ -162,6 +213,7 @@ def new_game(btn):
                 tiles[i][j].bind("<Enter>", on_hover)
                 tiles[i][j].bind("<Leave>", on_leave)
 
+                
 def set_lvl(new_size_x, new_size_y, new_mines_number):
     global size_x, size_y, mines_number, frame3, tiles
     
