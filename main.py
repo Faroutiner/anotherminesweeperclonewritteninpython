@@ -188,7 +188,6 @@ def new_game(btn):
     grid = generate(size_y, size_x, mines_number)
     is_active = False
     time = -1
-    print(grid)
 
     if btn:
         new_game_btn.config(image = python_img)
